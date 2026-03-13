@@ -483,8 +483,33 @@ async def handle_callback(client: Client, query: CallbackQuery):
         return
 
 
+# ── Dummy web server (Render free tier ke liye) ──────────────────────────────
+
+from flask import Flask
+from threading import Thread
+
+web = Flask(__name__)
+
+@web.route("/")
+def home():
+    return "✅ Upload Bot is running!", 200
+
+@web.route("/health")
+def health():
+    return "OK", 200
+
+def run_web():
+    port = int(os.environ.get("PORT", 8080))
+    web.run(host="0.0.0.0", port=port)
+
+
 # ── Run ───────────────────────────────────────────────────────────────────────
 
 print("━━━ Upload Bot Starting ━━━")
 print("Bot chal raha hai... (Ctrl+C se band karo)\n")
+
+# Web server alag thread mein chalao
+Thread(target=run_web, daemon=True).start()
+
 app.run()
+
